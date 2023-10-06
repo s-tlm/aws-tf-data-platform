@@ -73,7 +73,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "ap-southeast-2"
+  region = "ap-southeast-2"
 }
 
 #------------------------------------------------------------------------------
@@ -102,9 +102,9 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count = local.num_private_subnets
 
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = var.private_snet_cidr_block[count.index]
-  availability_zone       = data.aws_availability_zones.this.names[count.index]
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.private_snet_cidr_block[count.index]
+  availability_zone = data.aws_availability_zones.this.names[count.index]
 }
 
 resource "aws_internet_gateway" "this" {
@@ -125,7 +125,7 @@ resource "aws_nat_gateway" "this" {
   subnet_id     = aws_subnet.private[0].id
   depends_on    = [aws_internet_gateway.this]
   tags = {
-    Name        = "fun-nat"
+    Name = "fun-nat"
   }
 }
 
@@ -182,7 +182,7 @@ resource "aws_security_group" "default" {
     protocol  = "-1"
     self      = true
   }
-  
+
   ingress {
     description = "Allow ingress to MySQL"
     from_port   = "0"
@@ -276,13 +276,13 @@ resource "aws_instance" "this" {
   key_name                    = aws_key_pair.this.key_name
   subnet_id                   = aws_subnet.public[1].id
   vpc_security_group_ids      = [aws_security_group.default.id]
-  user_data                   = templatefile(var.user_data, {
-                                  host     = aws_db_instance.mysql.address, 
-                                  username = var.username, 
-                                  password = var.password
-                                })
+  user_data = templatefile(var.user_data, {
+    host     = aws_db_instance.mysql.address,
+    username = var.username,
+    password = var.password
+  })
   user_data_replace_on_change = true
-  
+
   tags = {
     Name = "fun-ec2-dev"
   }
@@ -304,12 +304,12 @@ resource "aws_instance" "this" {
 
 output "db_endpoint" {
   description = "The database endpoint"
-  value = aws_db_instance.mysql.endpoint
+  value       = aws_db_instance.mysql.endpoint
 }
 
 output "landing_zone_arn" {
   description = "ARN of the landing zone S3 bucket"
-  value = aws_s3_bucket.landing_zone.arn
+  value       = aws_s3_bucket.landing_zone.arn
 }
 
 output "ec2_public_dns" {
