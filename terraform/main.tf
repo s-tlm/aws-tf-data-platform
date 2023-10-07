@@ -2,51 +2,12 @@
 # Use DMS to migrate sample data
 
 #------------------------------------------------------------------------------
-# Variables
+# Data
 #------------------------------------------------------------------------------
 
-variable "vpc_cidr_block" {
-  description = "Main VPC CIDR block"
-  default     = "10.0.0.0/16"
-  type        = string
-}
-
-variable "public_snet_cidr_block" {
-  description = "Public subnets CIDR block"
-  default     = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
-  type        = list(string)
-}
-
-
-variable "private_snet_cidr_block" {
-  description = "Private subnets CIDR block"
-  default     = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
-  type        = list(string)
-}
-
-variable "username" {
-  description = "Username for RDS DB"
-  default     = "masteruser"
-  type        = string
-}
-
-variable "password" {
-  description = "Password for RDS DB"
-  default     = "masterpassword"
-  type        = string
-}
-
-variable "public_key" {
-  description = "Path of public key used to SSH to EC2"
-  default     = "~/.ssh/id_rsa.pub"
-  type        = string
-}
-
-variable "user_data" {
-  description = "Path to EC2 user data"
-  default     = "./user-data/create-data.sh"
-  type        = string
-}
+# data "aws_region" "current" {}
+# data "aws_partition" "current" {}
+# data "aws_caller_identity" "current" {}
 
 #------------------------------------------------------------------------------
 # Locals
@@ -55,6 +16,11 @@ variable "user_data" {
 locals {
   num_public_subnets  = length(var.public_snet_cidr_block)
   num_private_subnets = length(var.private_snet_cidr_block)
+  # https://registry.terraform.io/modules/terraform-aws-modules/dms/aws/latest
+  # account_id = data.aws_caller_identity.current.account_id
+  # dns_suffix = data.aws_partition.current.dns_suffix
+  # partition  = data.aws_partition.current.partition
+  # region     = data.aws_region.current.name
 }
 
 #------------------------------------------------------------------------------
@@ -295,24 +261,50 @@ resource "aws_instance" "this" {
 # TODO
 # Create policy to connect to landing zone
 # Create source and target DMS endpoints
+# Create replication instance
 # Create DMS instance and configure full-load task
 
+# data "aws_iam_policy_document" "this" {
+#   statement {
+#     sid = "DMSAssumeRole"
+#     actions = [
+#       "sts:AssumeRole",
+#       "sts:TagSession",
+#     ]
 
-#------------------------------------------------------------------------------
-# Outputs
-#------------------------------------------------------------------------------
+#     principals {
+#       identifiers = [
+#         "dms.${local.dns_suffix}",
+#         "dms.${local.region}.${local.dns_suffix}",
+#       ]
+#       type = "Service"
+#     }
 
-output "db_endpoint" {
-  description = "The database endpoint"
-  value       = aws_db_instance.mysql.endpoint
-}
+#     # https://docs.aws.amazon.com/dms/latest/userguide/cross-service-confused-deputy-prevention.html#cross-service-confused-deputy-prevention-dms-api
+#     condition {
+#       test     = "ArnLike"
+#       variable = "aws:SourceArn"
+#       values   = ["arn:${local.partition}:dms:${local.region}:${local.account_id}:*"]
+#     }
 
-output "landing_zone_arn" {
-  description = "ARN of the landing zone S3 bucket"
-  value       = aws_s3_bucket.landing_zone.arn
-}
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceAccount"
+#       values   = [local.account_id]
+#     }
+#   }
+# }
 
-output "ec2_public_dns" {
-  description = "Login DNS of the EC2 instance"
-  value       = "ec2-user@${aws_instance.this.public_dns}"
-}
+# resource "aws_dms_endpoint" "source" {
+
+# }
+
+# resource "aws_dms_endpoint" "target" {
+
+# }
+
+# resource "aws_dms_replication_instance" "name" {
+#   
+# }
+
+# resource "aws_dms_replication_task" "this" {
