@@ -23,6 +23,9 @@ No modules.
 | [aws_db_instance.mysql](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance) | resource |
 | [aws_db_subnet_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_subnet_group) | resource |
 | [aws_eip.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_iam_policy.access_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy_attachment.role_s3_attach](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment) | resource |
+| [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_instance.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_internet_gateway.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
 | [aws_key_pair.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
@@ -41,11 +44,21 @@ No modules.
 | [aws_subnet.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [aws_availability_zones.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_iam_policy_document.access_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.role_assume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_create_dms"></a> [create\_dms](#input\_create\_dms) | Create DMS? | `bool` | `true` | no |
+| <a name="input_create_ec2"></a> [create\_ec2](#input\_create\_ec2) | Create EC2? | `bool` | `true` | no |
+| <a name="input_create_landing_zone"></a> [create\_landing\_zone](#input\_create\_landing\_zone) | Create S3 landing zone? | `bool` | `true` | no |
+| <a name="input_create_rds"></a> [create\_rds](#input\_create\_rds) | Create RDS? | `bool` | `true` | no |
+| <a name="input_create_vpc"></a> [create\_vpc](#input\_create\_vpc) | Create VPC? | `bool` | `true` | no |
+| <a name="input_default_region"></a> [default\_region](#input\_default\_region) | The default AWS region | `string` | `"ap-southeast-2"` | no |
 | <a name="input_password"></a> [password](#input\_password) | Password for RDS DB | `string` | `"masterpassword"` | no |
 | <a name="input_private_snet_cidr_block"></a> [private\_snet\_cidr\_block](#input\_private\_snet\_cidr\_block) | Private subnets CIDR block | `list(string)` | <pre>[<br>  "10.0.96.0/19",<br>  "10.0.128.0/19",<br>  "10.0.160.0/19"<br>]</pre> | no |
 | <a name="input_public_key"></a> [public\_key](#input\_public\_key) | Path of public key used to SSH to EC2 | `string` | `"~/.ssh/id_rsa.pub"` | no |

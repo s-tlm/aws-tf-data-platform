@@ -4,15 +4,15 @@
 
 output "db_endpoint" {
   description = "The database endpoint"
-  value       = aws_db_instance.mysql.endpoint
+  value       = try(aws_db_instance.mysql[0].endpoint, null)
 }
 
 output "landing_zone_arn" {
   description = "ARN of the landing zone S3 bucket"
-  value       = aws_s3_bucket.landing_zone.arn
+  value       = try(aws_s3_bucket.landing_zone[0].arn, null)
 }
 
 output "ec2_public_dns" {
   description = "Login DNS of the EC2 instance"
-  value       = "ec2-user@${aws_instance.this.public_dns}"
+  value       = try("ec2-user@${aws_instance.this[0].public_dns}", null)
 }
