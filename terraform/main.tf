@@ -1,6 +1,3 @@
-# Create MySQL database
-# Use DMS to migrate sample data
-
 #------------------------------------------------------------------------------
 # Data
 #------------------------------------------------------------------------------
@@ -72,6 +69,25 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.this[0].id
   cidr_block        = var.private_snet_cidr_block[count.index]
   availability_zone = data.aws_availability_zones.this[0].names[count.index]
+}
+
+resource "aws_db_subnet_group" "public" {
+  count = var.create_vpc ? 1 : 0
+
+  name        = "fun-public-subnet-group"
+  description = "Public subnet group"
+  subnet_ids  = aws_subnet.public[*].id
+}
+
+resource "aws_dms_replication_subnet_group" "private" {
+  count = var.create_vpc ? 1 : 0
+
+  replication_subnet_group_id          = "fun-private-subnet-group"
+  replication_subnet_group_description = "DMS private subnet group"
+  subnet_ids                           = aws_subnet.private[*].id
+
+  # Requires service role with DMS VPC Management permissions
+  depends_on = [aws_iam_role.dms_vpc]
 }
 
 resource "aws_internet_gateway" "this" {
@@ -228,13 +244,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "landing_zone" {
 # RDS MySQL Instance
 #------------------------------------------------------------------------------
 
-resource "aws_db_subnet_group" "this" {
-  count = var.create_vpc && var.create_rds ? 1 : 0
-
-  name       = "fun-subnet-group"
-  subnet_ids = aws_subnet.public[*].id
-}
-
 resource "aws_db_instance" "mysql" {
   count = var.create_vpc && var.create_rds ? 1 : 0
 
@@ -247,7 +256,7 @@ resource "aws_db_instance" "mysql" {
   username               = var.username
   password               = var.password
   skip_final_snapshot    = true
-  db_subnet_group_name   = aws_db_subnet_group.this[0].name
+  db_subnet_group_name   = aws_db_subnet_group.public[0].name
   vpc_security_group_ids = [aws_security_group.default[0].id]
   publicly_accessible    = true
 }
@@ -289,7 +298,6 @@ resource "aws_instance" "this" {
 #------------------------------------------------------------------------------
 
 # TODO
-# Create source and target DMS endpoints
 # Create replication instance
 # Create DMS instance and configure full-load task
 
@@ -331,42 +339,79 @@ data "aws_iam_policy_document" "access_s3" {
   }
 }
 
-resource "aws_iam_role" "this" {
+resource "aws_iam_role" "access_s3" {
   count = var.create_dms ? 1 : 0
 
-  name                  = "fun-dms-role"
-  description           = "IAM service role for DMS"
+  name                  = "fun-dms-s3-role"
+  description           = "IAM service role for DMS to access target S3 bucket"
   assume_role_policy    = data.aws_iam_policy_document.role_assume[0].json
+  force_detach_policies = true
+}
+
+resource "aws_iam_role" "dms_vpc" {
+  count = var.create_dms ? 1 : 0
+
+  name                  = "fun-dms-vpc-role"
+  description           = "IAM service role for DMS to manage VPC"
+  assume_role_policy    = data.aws_iam_policy_document.role_assume[0].json
+  managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
   force_detach_policies = true
 }
 
 resource "aws_iam_policy" "access_s3" {
   count = var.create_dms ? 1 : 0
 
-  name        = "fun-s3-access-role"
+  name        = "fun-dms-landing-zone-policy"
   description = "Policy to access DMS target S3 bucket"
   policy      = data.aws_iam_policy_document.access_s3[0].json
 }
 
-
-resource "aws_iam_policy_attachment" "role_s3_attach" {
+resource "aws_iam_role_policy_attachment" "role_s3_attach" {
   count = var.create_dms ? 1 : 0
 
-  name       = "fun-dms-role-attachment"
-  roles      = [aws_iam_role.this[0].name]
+  role       = aws_iam_role.access_s3[0].name
   policy_arn = aws_iam_policy.access_s3[0].arn
 }
 
-# resource "aws_dms_endpoint" "source" {
+resource "aws_dms_endpoint" "this" {
+  count = var.create_dms ? 1 : 0
 
-# }
+  endpoint_id   = "fun-dms-mysql-endpoint"
+  endpoint_type = "source"
+  engine_name   = "mysql"
+  database_name = aws_db_instance.mysql[0].db_name
+  server_name   = aws_db_instance.mysql[0].endpoint
+  username      = var.username
+  password      = var.password
+  port          = aws_db_instance.mysql[0].port
+}
 
-# resource "aws_dms_endpoint" "target" {
+resource "aws_dms_s3_endpoint" "this" {
+  count = var.create_dms ? 1 : 0
 
-# }
+  endpoint_id             = "fun-dms-landing-zone-endpoint"
+  endpoint_type           = "target"
+  bucket_name             = aws_s3_bucket.landing_zone[0].id
+  bucket_folder           = "sakila-db"
+  service_access_role_arn = aws_iam_role.access_s3[0].arn
+}
 
-# resource "aws_dms_replication_instance" "name" {
-#   
-# }
+resource "aws_dms_replication_instance" "this" {
+  count = var.create_dms ? 1 : 0
+
+  replication_instance_id     = "fun-dms-replication-instance"
+  allocated_storage           = 10
+  apply_immediately           = true
+  auto_minor_version_upgrade  = true
+  availability_zone           = data.aws_availability_zones.this[0].names[0]
+  engine_version              = "3.5.1"
+  publicly_accessible         = false
+  replication_instance_class  = "dms.t2.micro"
+  replication_subnet_group_id = aws_dms_replication_subnet_group.private[0].id
+  vpc_security_group_ids      = [aws_security_group.default[0].id]
+  multi_az                    = false
+
+  depends_on = [aws_iam_role.dms_vpc]
+}
 
 # resource "aws_dms_replication_task" "this" {
