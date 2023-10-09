@@ -45,6 +45,10 @@ resource "aws_vpc" "this" {
 
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
+
+  tags = {
+    Name = "fun-vpc"
+  }
 }
 
 # Declare the data source
@@ -61,6 +65,10 @@ resource "aws_subnet" "public" {
   cidr_block              = var.public_snet_cidr_block[count.index]
   availability_zone       = data.aws_availability_zones.this[0].names[count.index]
   map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-${count.index + 1}"
+  }
 }
 
 resource "aws_subnet" "private" {
@@ -69,6 +77,10 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.this[0].id
   cidr_block        = var.private_snet_cidr_block[count.index]
   availability_zone = data.aws_availability_zones.this[0].names[count.index]
+
+  tags = {
+    Name = "private-subnet-${count.index + 1}"
+  }
 }
 
 resource "aws_db_subnet_group" "public" {
@@ -111,7 +123,7 @@ resource "aws_nat_gateway" "this" {
   count = var.create_vpc ? 1 : 0
 
   allocation_id = aws_eip.this[0].id
-  subnet_id     = aws_subnet.private[0].id
+  subnet_id     = aws_subnet.public[0].id
   depends_on    = [aws_internet_gateway.this[0]]
   tags = {
     Name = "fun-nat"
@@ -128,6 +140,14 @@ resource "aws_route_table" "public" {
   }
 }
 
+resource "aws_route" "public" {
+  count = var.create_vpc ? 1 : 0
+
+  route_table_id         = aws_route_table.public[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this[0].id
+}
+
 resource "aws_route_table" "private" {
   count = var.create_vpc ? 1 : 0
 
@@ -136,14 +156,6 @@ resource "aws_route_table" "private" {
   tags = {
     Name = "fun-private-route-table"
   }
-}
-
-resource "aws_route" "public" {
-  count = var.create_vpc ? 1 : 0
-
-  route_table_id         = aws_route_table.public[0].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.this[0].id
 }
 
 resource "aws_route" "private" {
@@ -183,7 +195,7 @@ resource "aws_security_group" "default" {
   }
 
   ingress {
-    description = "Allow ingress to MySQL"
+    description = "Allow public ingress to MySQL RDS database"
     from_port   = "0"
     to_port     = "3306"
     protocol    = "tcp"
@@ -281,7 +293,7 @@ resource "aws_instance" "this" {
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.default[0].id]
   user_data = templatefile(var.user_data, {
-    host     = aws_db_instance.mysql[0].address,
+    host     = try(aws_db_instance.mysql[0].address, ""),
     username = var.username,
     password = var.password
   })
@@ -296,10 +308,6 @@ resource "aws_instance" "this" {
 #------------------------------------------------------------------------------
 # Migrate Data to S3 using DMS
 #------------------------------------------------------------------------------
-
-# TODO
-# Create replication instance
-# Create DMS instance and configure full-load task
 
 data "aws_iam_policy_document" "role_assume" {
   count = var.create_dms ? 1 : 0
@@ -327,15 +335,16 @@ data "aws_iam_policy_document" "access_s3" {
   statement {
     sid = "S3Target"
     actions = [
-      "s3:ListBucket",
       "s3:PutObject",
+      "s3:ListBucket",
       "s3:DeleteObject",
-      "s3:PutObjectTagging",
+      "s3:PutObjectTagging"
     ]
     resources = [
       aws_s3_bucket.landing_zone[0].arn,
       "${aws_s3_bucket.landing_zone[0].arn}/*"
     ]
+    effect = "Allow"
   }
 }
 
@@ -380,7 +389,7 @@ resource "aws_dms_endpoint" "this" {
   endpoint_type = "source"
   engine_name   = "mysql"
   database_name = aws_db_instance.mysql[0].db_name
-  server_name   = aws_db_instance.mysql[0].endpoint
+  server_name   = aws_db_instance.mysql[0].address
   username      = var.username
   password      = var.password
   port          = aws_db_instance.mysql[0].port
@@ -392,7 +401,8 @@ resource "aws_dms_s3_endpoint" "this" {
   endpoint_id             = "fun-dms-landing-zone-endpoint"
   endpoint_type           = "target"
   bucket_name             = aws_s3_bucket.landing_zone[0].id
-  bucket_folder           = "sakila-db"
+  bucket_folder           = "sakila"
+  data_format             = "parquet"
   service_access_role_arn = aws_iam_role.access_s3[0].arn
 }
 
@@ -414,4 +424,13 @@ resource "aws_dms_replication_instance" "this" {
   depends_on = [aws_iam_role.dms_vpc]
 }
 
-# resource "aws_dms_replication_task" "this" {
+resource "aws_dms_replication_task" "this" {
+  count = var.create_dms ? 1 : 0
+
+  replication_task_id      = "fun-dms-replication-task"
+  migration_type           = "full-load" # Can be full-load | cdc | full-load-and-cdc
+  replication_instance_arn = aws_dms_replication_instance.this[0].replication_instance_arn
+  source_endpoint_arn      = aws_dms_endpoint.this[0].endpoint_arn
+  target_endpoint_arn      = aws_dms_s3_endpoint.this[0].endpoint_arn
+  table_mappings           = file("./config/dms/sakila-table-mapping.json")
+}

@@ -25,6 +25,7 @@ No modules.
 | [aws_dms_endpoint.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_endpoint) | resource |
 | [aws_dms_replication_instance.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_replication_instance) | resource |
 | [aws_dms_replication_subnet_group.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_replication_subnet_group) | resource |
+| [aws_dms_replication_task.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_replication_task) | resource |
 | [aws_dms_s3_endpoint.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dms_s3_endpoint) | resource |
 | [aws_eip.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_iam_policy.access_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
@@ -77,6 +78,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_db_endpoint"></a> [db\_endpoint](#output\_db\_endpoint) | The database endpoint |
+| <a name="output_dms_replication_task_status"></a> [dms\_replication\_task\_status](#output\_dms\_replication\_task\_status) | The status of the DMS replication task |
 | <a name="output_ec2_public_dns"></a> [ec2\_public\_dns](#output\_ec2\_public\_dns) | Login DNS of the EC2 instance |
 | <a name="output_landing_zone_arn"></a> [landing\_zone\_arn](#output\_landing\_zone\_arn) | ARN of the landing zone S3 bucket |
 <!-- END_TF_DOCS -->
