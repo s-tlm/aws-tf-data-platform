@@ -401,7 +401,7 @@ resource "aws_dms_s3_endpoint" "this" {
   endpoint_id             = "fun-dms-landing-zone-endpoint"
   endpoint_type           = "target"
   bucket_name             = aws_s3_bucket.landing_zone[0].id
-  bucket_folder           = "sakila"
+  bucket_folder           = "rds-mysql"
   data_format             = "parquet"
   service_access_role_arn = aws_iam_role.access_s3[0].arn
 }
