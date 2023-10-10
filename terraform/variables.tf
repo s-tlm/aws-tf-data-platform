@@ -12,59 +12,25 @@ variable "default_region" {
 # Choose which resources to create
 #------------------------------------------------------------------------------
 
-variable "create_vpc" {
-  type        = bool
-  description = "Create VPC?"
-  default     = true
-}
 
 variable "create_rds" {
   type        = bool
   description = "Create RDS?"
-  default     = true
+  default     = false
 }
 
 variable "create_ec2" {
   type        = bool
   description = "Create EC2?"
-  default     = true
-}
-
-
-variable "create_landing_zone" {
-  type        = bool
-  description = "Create S3 landing zone?"
-  default     = true
+  default     = false
 }
 
 variable "create_dms" {
   type        = bool
   description = "Create DMS?"
-  default     = true
+  default     = false
 }
 
-#------------------------------------------------------------------------------
-# VPC config
-#------------------------------------------------------------------------------
-
-variable "vpc_cidr_block" {
-  type        = string
-  description = "Main VPC CIDR block"
-  default     = "10.0.0.0/16"
-}
-
-variable "public_snet_cidr_block" {
-  type        = list(string)
-  description = "Public subnets CIDR block"
-  default     = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
-}
-
-
-variable "private_snet_cidr_block" {
-  type        = list(string)
-  description = "Private subnets CIDR block"
-  default     = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
-}
 
 #------------------------------------------------------------------------------
 # RDS config
