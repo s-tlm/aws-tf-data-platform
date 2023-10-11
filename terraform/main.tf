@@ -22,7 +22,7 @@ provider "aws" {
 #------------------------------------------------------------------------------
 
 module "main_vpc" {
-  source = "./modules/main-vpc/"
+  source = "./modules/main-vpc"
 
   create                  = true
   vpc_cidr_block          = "10.0.0.0/16"
@@ -31,14 +31,14 @@ module "main_vpc" {
 }
 
 module "data_tiers" {
-  source = "./modules/data-storage/s3/"
+  source = "./modules/data-storage/s3"
 
   create       = true
   bucket_names = ["raw", "conformed", "curated"]
 }
 
 module "mysql" {
-  source = "./modules/data-storage/mysql/"
+  source = "./modules/data-storage/mysql"
 
   create                 = true
   seed                   = true
@@ -52,7 +52,7 @@ module "mysql" {
 }
 
 module "dms" {
-  source = "./modules/data-ingestion/migration-service/"
+  source = "./modules/data-ingestion/migration-service"
 
   create        = true
   target_s3_arn = module.data_tiers.bucket_arns[0]

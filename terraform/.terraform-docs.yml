@@ -5,8 +5,7 @@ version: ">=0.16.0"
 header-from: main.tf
 
 recursive:
-  enabled: true
-  path: modules
+  enabled: false
 
 sections:
   show:
