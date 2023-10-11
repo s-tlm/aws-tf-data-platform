@@ -6,10 +6,6 @@
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
 
-## Providers
-
-No providers.
-
 ## Modules
 
 | Name | Source | Version |
@@ -18,14 +14,6 @@ No providers.
 | <a name="module_dms"></a> [dms](#module\_dms) | ./modules/data-ingestion/migration-service/ | n/a |
 | <a name="module_main_vpc"></a> [main\_vpc](#module\_main\_vpc) | ./modules/main-vpc/ | n/a |
 | <a name="module_mysql"></a> [mysql](#module\_mysql) | ./modules/data-storage/mysql/ | n/a |
-
-## Resources
-
-No resources.
-
-## Inputs
-
-No inputs.
 
 ## Outputs
 
