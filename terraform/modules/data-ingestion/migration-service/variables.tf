@@ -58,3 +58,8 @@ variable "vpc_security_group_ids" {
   type        = list(string)
   description = "A list of VPC security group IDs to assign to DMS replication instance"
 }
+
+variable "table_mappings" {
+  type        = string
+  description = "The directory of the JSON containing the target table mapping"
+}

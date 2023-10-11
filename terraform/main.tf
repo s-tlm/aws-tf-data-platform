@@ -14,7 +14,7 @@ terraform {
 }
 
 provider "aws" {
-  region = var.default_region
+  region = "ap-southeast-2"
 }
 
 #------------------------------------------------------------------------------
@@ -41,12 +41,14 @@ module "mysql" {
   source = "./modules/data-storage/mysql/"
 
   create                 = true
+  seed                   = true
   master_username        = "masteruser"
   master_password        = "masterpassword"
   public_key             = "~/.ssh/id_rsa.pub"
   db_subnet_group_ids    = module.main_vpc.public_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
   instance_subnet        = module.main_vpc.public_subnet_ids[0]
+  user_data              = "./modules/data-storage/mysql/user-data/seed-database.sh"
 }
 
 module "dms" {
@@ -69,6 +71,7 @@ module "dms" {
     bucket_folder = "rds-mysql"
     data_format   = "parquet"
   }
+  table_mappings         = "./config/dms/sakila-table-mapping.json"
   subnet_ids             = module.main_vpc.private_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
 }

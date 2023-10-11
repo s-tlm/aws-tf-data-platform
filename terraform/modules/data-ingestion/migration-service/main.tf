@@ -88,26 +88,24 @@ resource "aws_iam_role_policy_attachment" "role_s3_attach" {
 resource "aws_dms_endpoint" "this" {
   count = var.create ? 1 : 0
 
-  #TODO remove lookup function. Access objects in map using var.variable[]
-  endpoint_id   = "${var.environment}-dms-${lookup(var.source_endpoint, "engine_name")}-endpoint"
-  endpoint_type = lookup(var.source_endpoint, "endpoint_type")
-  engine_name   = lookup(var.source_endpoint, "engine_name")
-  database_name = lookup(var.source_endpoint, "database_name")
-  server_name   = lookup(var.source_endpoint, "server_name")
-  username      = lookup(var.source_endpoint, "username")
-  password      = lookup(var.source_endpoint, "password")
-  port          = lookup(var.source_endpoint, "port")
+  endpoint_id   = "${var.environment}-dms-${var.source_endpoint["engine_name"]}-endpoint"
+  endpoint_type = var.source_endpoint["endpoint_type"]
+  engine_name   = var.source_endpoint["engine_name"]
+  database_name = var.source_endpoint["database_name"]
+  server_name   = var.source_endpoint["server_name"]
+  username      = var.source_endpoint["username"]
+  password      = var.source_endpoint["password"]
+  port          = var.source_endpoint["port"]
 }
 
 resource "aws_dms_s3_endpoint" "this" {
   count = var.create ? 1 : 0
 
-  #TODO remove lookup function. Access objects in map using var.variable[]
-  endpoint_id             = "${var.environment}-dms-${lookup(var.target_s3_endpoint, "bucket_name")}-endpoint"
-  endpoint_type           = lookup(var.target_s3_endpoint, "endpoint_type")
-  bucket_name             = lookup(var.target_s3_endpoint, "bucket_name")
-  bucket_folder           = lookup(var.target_s3_endpoint, "bucket_folder")
-  data_format             = lookup(var.target_s3_endpoint, "data_format")
+  endpoint_id             = "${var.environment}-dms-${var.target_s3_endpoint["bucket_name"]}-endpoint"
+  endpoint_type           = var.target_s3_endpoint["endpoint_type"]
+  bucket_name             = var.target_s3_endpoint["bucket_name"]
+  bucket_folder           = var.target_s3_endpoint["bucket_folder"]
+  data_format             = var.target_s3_endpoint["data_format"]
   service_access_role_arn = aws_iam_role.access_s3[0].arn
 }
 
@@ -143,10 +141,10 @@ resource "aws_dms_replication_instance" "this" {
 resource "aws_dms_replication_task" "this" {
   count = var.create ? 1 : 0
 
-  replication_task_id      = "fun-dms-replication-task"
-  migration_type           = "full-load" # Can be full-load | cdc | full-load-and-cdc
+  replication_task_id      = "${var.environment}-dms-replication-task"
+  migration_type           = "full-load" # Can be full-load | cdc | full-load-and-cdc. Only full-load configured right noe
   replication_instance_arn = aws_dms_replication_instance.this[0].replication_instance_arn
   source_endpoint_arn      = aws_dms_endpoint.this[0].endpoint_arn
   target_endpoint_arn      = aws_dms_s3_endpoint.this[0].endpoint_arn
-  table_mappings           = file("./config/dms/sakila-table-mapping.json")
+  table_mappings           = file(var.table_mappings)
 }

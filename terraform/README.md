@@ -25,16 +25,7 @@ No resources.
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_create_dms"></a> [create\_dms](#input\_create\_dms) | Create DMS? | `bool` | `false` | no |
-| <a name="input_create_ec2"></a> [create\_ec2](#input\_create\_ec2) | Create EC2? | `bool` | `false` | no |
-| <a name="input_create_rds"></a> [create\_rds](#input\_create\_rds) | Create RDS? | `bool` | `false` | no |
-| <a name="input_default_region"></a> [default\_region](#input\_default\_region) | The default AWS region | `string` | `"ap-southeast-2"` | no |
-| <a name="input_password"></a> [password](#input\_password) | Password for RDS DB | `string` | `"masterpassword"` | no |
-| <a name="input_public_key"></a> [public\_key](#input\_public\_key) | Path of public key used to SSH to EC2 | `string` | `"~/.ssh/id_rsa.pub"` | no |
-| <a name="input_user_data"></a> [user\_data](#input\_user\_data) | Path to EC2 user data | `string` | `"./user-data/create-data.sh"` | no |
-| <a name="input_username"></a> [username](#input\_username) | Username for RDS DB | `string` | `"masteruser"` | no |
+No inputs.
 
 ## Outputs
 

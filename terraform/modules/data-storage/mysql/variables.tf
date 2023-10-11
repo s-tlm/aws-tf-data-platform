@@ -49,7 +49,6 @@ variable "instance_ami" {
 variable "user_data" {
   type        = string
   description = "The directory of the bash script used to initialise the EC2 seed instance"
-  default     = "./user-data/seed-database.sh"
 }
 
 variable "environment" {
