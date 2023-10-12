@@ -70,21 +70,21 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_eip" "this" {
-  count = var.create ? 1 : 0
+  count = var.create ? local.num_private_subnets : 0
 
   domain     = "vpc"
   depends_on = [aws_internet_gateway.this]
 }
 
 resource "aws_nat_gateway" "this" {
-  count = var.create ? 1 : 0
+  count = var.create ? local.num_private_subnets : 0
 
-  allocation_id = aws_eip.this[0].id
-  subnet_id     = aws_subnet.public[0].id
+  allocation_id = aws_eip.this[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
   depends_on    = [aws_internet_gateway.this[0]]
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment}-nat" }
+    { Name = "${var.environment}-nat-${count.index}" }
   )
 }
 
@@ -108,21 +108,21 @@ resource "aws_route" "public" {
 }
 
 resource "aws_route_table" "private" {
-  count = var.create ? 1 : 0
+  count = var.create ? local.num_private_subnets : 0
 
   vpc_id = aws_vpc.this[0].id
 
   tags = merge(var.additional_tags,
-    { Name = "${var.environment}-prv-rtbl" }
+    { Name = "${var.environment}-prv-rtbl-${count.index}" }
   )
 }
 
 resource "aws_route" "private" {
-  count = var.create ? 1 : 0
+  count = var.create ? local.num_private_subnets : 0
 
-  route_table_id         = aws_route_table.private[0].id
+  route_table_id         = aws_route_table.private[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.this[0].id
+  nat_gateway_id         = aws_nat_gateway.this[count.index].id
 }
 
 resource "aws_route_table_association" "public" {
@@ -136,7 +136,7 @@ resource "aws_route_table_association" "private" {
   count = var.create ? local.num_private_subnets : 0
 
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[0].id
+  route_table_id = aws_route_table.private[count.index].id
 }
 
 resource "aws_security_group" "default" {
