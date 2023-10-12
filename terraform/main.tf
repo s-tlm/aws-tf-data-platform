@@ -33,15 +33,15 @@ module "main_vpc" {
 module "data_tiers" {
   source = "./modules/data-storage/s3"
 
-  create       = true
+  create       = false
   bucket_names = ["raw", "conformed", "curated"]
 }
 
 module "mysql" {
   source = "./modules/data-storage/mysql"
 
-  create                 = true
-  seed                   = true
+  create                 = false
+  seed                   = false
   master_username        = "masteruser"
   master_password        = "masterpassword"
   public_key             = "~/.ssh/id_rsa.pub"
@@ -54,8 +54,8 @@ module "mysql" {
 module "dms" {
   source = "./modules/data-ingestion/migration-service"
 
-  create        = true
-  target_s3_arn = module.data_tiers.bucket_arns[0]
+  create        = false
+  target_s3_arn = try(module.data_tiers.bucket_arns[0], "")
   source_endpoint = {
     endpoint_type = "source"
     engine_name   = "mysql"
@@ -67,7 +67,7 @@ module "dms" {
   }
   target_s3_endpoint = {
     endpoint_type = "target"
-    bucket_name   = module.data_tiers.bucket_ids[0]
+    bucket_name   = try(module.data_tiers.bucket_ids[0], "")
     bucket_folder = "rds-mysql"
     data_format   = "parquet"
   }
