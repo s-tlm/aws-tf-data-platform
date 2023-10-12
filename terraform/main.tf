@@ -84,4 +84,5 @@ module "dms" {
   subnet_ids             = module.main_vpc.private_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
   environment            = var.environment
+  start_replication_task = true
 }

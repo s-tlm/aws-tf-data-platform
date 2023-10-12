@@ -158,4 +158,5 @@ resource "aws_dms_replication_task" "this" {
   source_endpoint_arn      = aws_dms_endpoint.this[0].endpoint_arn
   target_endpoint_arn      = aws_dms_s3_endpoint.this[0].endpoint_arn
   table_mappings           = file(var.table_mappings)
+  start_replication_task   = var.start_replication_task
 }

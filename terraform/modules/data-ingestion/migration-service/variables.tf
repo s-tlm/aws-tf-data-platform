@@ -63,3 +63,9 @@ variable "table_mappings" {
   type        = string
   description = "The directory of the JSON containing the target table mapping"
 }
+
+variable "start_replication_task" {
+  type        = bool
+  description = "Whether to auto-start the replication task"
+  default     = false
+}
