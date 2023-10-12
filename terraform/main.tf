@@ -36,6 +36,10 @@ module "main_vpc" {
   additional_tags         = var.additional_tags
 }
 
+#------------------------------------------------------------------------------
+# Create Data Tiers
+#------------------------------------------------------------------------------
+
 module "data_tiers" {
   source = "./modules/data-storage/s3"
 
@@ -43,6 +47,10 @@ module "data_tiers" {
   bucket_names = ["bronze", "silver", "gold"]
   environment  = var.environment
 }
+
+#------------------------------------------------------------------------------
+# Create MySQL Database and Seed Data
+#------------------------------------------------------------------------------
 
 module "mysql" {
   source = "./modules/data-storage/mysql"
@@ -59,6 +67,10 @@ module "mysql" {
   environment            = var.environment
   additional_tags        = var.additional_tags
 }
+
+#------------------------------------------------------------------------------
+# Create Migration Service
+#------------------------------------------------------------------------------
 
 module "dms" {
   source = "./modules/data-ingestion/migration-service"
