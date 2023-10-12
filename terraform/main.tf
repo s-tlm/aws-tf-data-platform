@@ -40,7 +40,7 @@ module "data_tiers" {
   source = "./modules/data-storage/s3"
 
   create       = false
-  bucket_names = ["raw", "conformed", "curated"]
+  bucket_names = ["bronze", "silver", "gold"]
   environment  = var.environment
 }
 
