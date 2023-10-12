@@ -28,6 +28,7 @@ module "main_vpc" {
   vpc_cidr_block          = "10.0.0.0/16"
   public_snet_cidr_block  = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
   private_snet_cidr_block = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
+  environment             = var.environment
 }
 
 module "data_tiers" {
@@ -35,6 +36,7 @@ module "data_tiers" {
 
   create       = false
   bucket_names = ["raw", "conformed", "curated"]
+  environment  = var.environment
 }
 
 module "mysql" {
@@ -49,6 +51,7 @@ module "mysql" {
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
   instance_subnet        = module.main_vpc.public_subnet_ids[0]
   user_data              = "./modules/data-storage/mysql/user-data/seed-database.sh"
+  environment            = var.environment
 }
 
 module "dms" {
@@ -74,4 +77,5 @@ module "dms" {
   table_mappings         = "./config/dms/sakila-table-mapping.json"
   subnet_ids             = module.main_vpc.private_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
+  environment            = var.environment
 }
