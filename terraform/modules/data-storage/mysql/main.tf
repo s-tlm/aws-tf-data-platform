@@ -1,3 +1,14 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+
+  required_version = ">= 1.5.7"
+}
+
 resource "aws_db_subnet_group" "this" {
   count = var.create ? 1 : 0
 
@@ -47,7 +58,8 @@ resource "aws_instance" "this" {
   user_data_replace_on_change = true
   associate_public_ip_address = true
 
-  tags = {
-    Name = "${var.environment}-${var.engine}-seed"
-  }
+  tags = merge(
+    var.additional_tags,
+    { Name = "${var.environment}-${var.engine}-seed" }
+  )
 }

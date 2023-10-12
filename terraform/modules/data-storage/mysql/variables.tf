@@ -88,3 +88,9 @@ variable "instance_subnet" {
   type        = string
   description = "The subnet ID that will host the EC2 seed instance"
 }
+
+variable "additional_tags" {
+  type        = map(string)
+  description = "Additional resource tags"
+  default     = {}
+}

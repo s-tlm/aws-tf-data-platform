@@ -29,3 +29,9 @@ variable "private_snet_cidr_block" {
   type        = list(string)
   description = "Private subnets CIDR block"
 }
+
+variable "additional_tags" {
+  type        = map(string)
+  description = "Additional resource tags"
+  default     = {}
+}
