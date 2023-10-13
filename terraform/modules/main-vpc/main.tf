@@ -12,6 +12,8 @@ terraform {
 locals {
   num_public_subnets  = length(var.public_snet_cidr_block)
   num_private_subnets = length(var.private_snet_cidr_block)
+  num_ingress_rules   = length(var.ingress_rules)
+  num_egress_rules    = length(var.egress_rules)
 }
 
 resource "aws_vpc" "this" {
@@ -145,34 +147,27 @@ resource "aws_security_group" "default" {
   name        = "${var.project}-${var.environment}-default-sg"
   description = "Default security group to allow inbound/outbound from the VPC"
   vpc_id      = aws_vpc.this[0].id
+}
 
-  ingress {
-    from_port = "0"
-    to_port   = "0"
-    protocol  = "-1"
-    self      = true
-  }
+resource "aws_vpc_security_group_ingress_rule" "this" {
+  count = var.create ? local.num_ingress_rules : 0
 
-  ingress {
-    description = "Allow public ingress to MySQL RDS database"
-    from_port   = "0"
-    to_port     = "3306"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  security_group_id            = aws_security_group.default[0].id
+  description                  = try(var.ingress_rules[count.index]["description"], null)
+  cidr_ipv4                    = try(var.ingress_rules[count.index]["cidr_ipv4"], null)
+  from_port                    = try(var.ingress_rules[count.index]["from_port"], null)
+  to_port                      = try(var.ingress_rules[count.index]["to_port"], null)
+  ip_protocol                  = try(var.ingress_rules[count.index]["ip_protocol"], null)
+  referenced_security_group_id = var.ingress_rules[count.index]["self"] ? aws_security_group.default[0].id : null
+}
 
-  ingress {
-    description = "Allow SSH to EC2"
-    from_port   = "0"
-    to_port     = "22"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_vpc_security_group_egress_rule" "this" {
+  count = var.create ? local.num_egress_rules : 0
 
-  egress {
-    from_port   = "0"
-    to_port     = "0"
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  security_group_id = aws_security_group.default[0].id
+  description       = try(var.egress_rules[count.index]["description"], null)
+  cidr_ipv4         = try(var.egress_rules[count.index]["cidr_ipv4"], null)
+  from_port         = try(var.egress_rules[count.index]["from_port"], null)
+  to_port           = try(var.egress_rules[count.index]["to_port"], null)
+  ip_protocol       = try(var.egress_rules[count.index]["ip_protocol"], null)
 }

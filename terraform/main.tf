@@ -35,6 +35,8 @@ module "main_vpc" {
   project                 = var.project
   environment             = var.environment
   additional_tags         = var.additional_tags
+  ingress_rules           = var.ingress_rules
+  egress_rules            = var.egress_rules
 }
 
 #------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ module "main_vpc" {
 module "data_tiers" {
   source = "./modules/data-storage/s3"
 
-  create       = true
+  create       = false
   bucket_names = ["bronze", "silver", "gold"]
   project      = var.project
   environment  = var.environment
@@ -57,8 +59,8 @@ module "data_tiers" {
 module "mysql" {
   source = "./modules/data-storage/rds"
 
-  create                 = true
-  seed                   = true
+  create                 = false
+  seed                   = false
   engine                 = "mysql"
   database_name          = "sakilaDb"
   engine_version         = "5.7"
