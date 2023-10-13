@@ -4,6 +4,11 @@ variable "create" {
   default     = false
 }
 
+variable "project" {
+  type        = string
+  description = "The Terraform project name"
+}
+
 variable "seed" {
   type        = bool
   description = "Seed database with sample data?"
@@ -19,13 +24,16 @@ variable "allocated_storage" {
 variable "engine" {
   type        = string
   description = "The database engine"
-  default     = "mysql"
 }
 
 variable "engine_version" {
   type        = string
   description = "The database engine version"
-  default     = "5.7"
+}
+
+variable "database_name" {
+  type        = string
+  description = "The name of the RDS database"
 }
 
 variable "database_instance_class" {

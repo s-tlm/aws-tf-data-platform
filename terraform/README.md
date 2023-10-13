@@ -14,7 +14,7 @@
 | <a name="module_dms"></a> [dms](#module\_dms) | ./modules/data-ingestion/migration-service | n/a |
 | <a name="module_glue"></a> [glue](#module\_glue) | ./modules/data-transformation | n/a |
 | <a name="module_main_vpc"></a> [main\_vpc](#module\_main\_vpc) | ./modules/main-vpc | n/a |
-| <a name="module_mysql"></a> [mysql](#module\_mysql) | ./modules/data-storage/mysql | n/a |
+| <a name="module_mysql"></a> [mysql](#module\_mysql) | ./modules/data-storage/rds | n/a |
 
 ## Outputs
 

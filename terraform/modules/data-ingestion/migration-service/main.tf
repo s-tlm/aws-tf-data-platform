@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "access_s3" {
 resource "aws_iam_role" "access_s3" {
   count = var.create ? 1 : 0
 
-  name               = "${var.environment}-dms-s3-role"
+  name               = "${var.project}-${var.environment}-dms-s3-role"
   description        = "IAM service role for DMS to access target S3 bucket"
   assume_role_policy = data.aws_iam_policy_document.role_assume[0].json
 
@@ -73,7 +73,7 @@ resource "aws_iam_role" "access_s3" {
 resource "aws_iam_role" "dms_vpc" {
   count = var.create ? 1 : 0
 
-  name                = "${var.environment}-dms-vpc-role"
+  name                = "${var.project}-${var.environment}-dms-vpc-role"
   description         = "IAM service role for DMS to manage VPC"
   assume_role_policy  = data.aws_iam_policy_document.role_assume[0].json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
@@ -84,7 +84,7 @@ resource "aws_iam_role" "dms_vpc" {
 resource "aws_iam_policy" "access_s3" {
   count = var.create ? 1 : 0
 
-  name        = "${var.environment}-dms-s3-policy"
+  name        = "${var.project}-${var.environment}-dms-s3-policy"
   description = "Policy to access DMS target S3 bucket"
   policy      = data.aws_iam_policy_document.access_s3[0].json
 }
@@ -99,7 +99,7 @@ resource "aws_iam_role_policy_attachment" "role_s3_attach" {
 resource "aws_dms_endpoint" "this" {
   count = var.create ? 1 : 0
 
-  endpoint_id   = "${var.environment}-dms-${var.source_endpoint["engine_name"]}-endpoint"
+  endpoint_id   = "${var.project}-${var.environment}-dms-${var.source_endpoint["engine_name"]}-ep"
   endpoint_type = var.source_endpoint["endpoint_type"]
   engine_name   = var.source_endpoint["engine_name"]
   database_name = var.source_endpoint["database_name"]
@@ -112,7 +112,7 @@ resource "aws_dms_endpoint" "this" {
 resource "aws_dms_s3_endpoint" "this" {
   count = var.create ? 1 : 0
 
-  endpoint_id             = "${var.environment}-dms-${var.target_s3_endpoint["bucket_name"]}-endpoint"
+  endpoint_id             = "${var.project}-${var.environment}-dms-${var.target_s3_endpoint["bucket_name"]}-ep"
   endpoint_type           = var.target_s3_endpoint["endpoint_type"]
   bucket_name             = var.target_s3_endpoint["bucket_name"]
   bucket_folder           = var.target_s3_endpoint["bucket_folder"]
@@ -123,7 +123,7 @@ resource "aws_dms_s3_endpoint" "this" {
 resource "aws_dms_replication_subnet_group" "this" {
   count = var.create ? 1 : 0
 
-  replication_subnet_group_id          = "${var.environment}-dms-snet-grp"
+  replication_subnet_group_id          = "${var.project}-${var.environment}-dms-snet-grp"
   replication_subnet_group_description = "DMS subnet group"
   subnet_ids                           = var.subnet_ids
 
@@ -134,7 +134,7 @@ resource "aws_dms_replication_subnet_group" "this" {
 resource "aws_dms_replication_instance" "this" {
   count = var.create ? 1 : 0
 
-  replication_instance_id     = "${var.environment}-dms-replication-instance"
+  replication_instance_id     = "${var.project}-${var.environment}-dms-repl-inst"
   allocated_storage           = var.allocated_storage
   apply_immediately           = true
   auto_minor_version_upgrade  = true
@@ -152,7 +152,7 @@ resource "aws_dms_replication_instance" "this" {
 resource "aws_dms_replication_task" "this" {
   count = var.create ? 1 : 0
 
-  replication_task_id      = "${var.environment}-dms-replication-task"
+  replication_task_id      = "${var.project}-${var.environment}-dms-repl-task"
   migration_type           = "full-load" # Can be full-load | cdc | full-load-and-cdc. Only full-load configured right noe
   replication_instance_arn = aws_dms_replication_instance.this[0].replication_instance_arn
   source_endpoint_arn      = aws_dms_endpoint.this[0].endpoint_arn

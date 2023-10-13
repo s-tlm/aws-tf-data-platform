@@ -1,3 +1,8 @@
+variable "project" {
+  type        = string
+  description = "The Terraform project name"
+}
+
 variable "environment" {
   type        = string
   description = "The AWS environment name"

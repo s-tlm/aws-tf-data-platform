@@ -22,7 +22,7 @@ resource "aws_vpc" "this" {
 
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment} VPC" }
+    { Name = "${var.project}-${var.environment}-vpc" }
   )
 }
 
@@ -41,7 +41,7 @@ resource "aws_subnet" "public" {
 
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment} Public Subnet ${count.index + 1}" }
+    { Name = "${var.project}-${var.environment}-pub-snet${count.index + 1}" }
   )
 }
 
@@ -54,7 +54,7 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment} Private Subnet ${count.index + 1}" }
+    { Name = "${var.project}-${var.environment}-prv-snet${count.index + 1}" }
   )
 }
 
@@ -65,7 +65,7 @@ resource "aws_internet_gateway" "this" {
 
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment}-igw" }
+    { Name = "${var.project}-${var.environment}-igw" }
   )
 }
 
@@ -84,7 +84,7 @@ resource "aws_nat_gateway" "this" {
   depends_on    = [aws_internet_gateway.this[0]]
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment}-nat-${count.index}" }
+    { Name = "${var.project}-${var.environment}-nat${count.index + 1}" }
   )
 }
 
@@ -95,7 +95,7 @@ resource "aws_route_table" "public" {
 
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment}-pub-rtbl" }
+    { Name = "${var.project}-${var.environment}-pub-rtbl" }
   )
 }
 
@@ -113,7 +113,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this[0].id
 
   tags = merge(var.additional_tags,
-    { Name = "${var.environment}-prv-rtbl-${count.index}" }
+    { Name = "${var.project}-${var.environment}-prv-rtbl${count.index + 1}" }
   )
 }
 
@@ -142,7 +142,7 @@ resource "aws_route_table_association" "private" {
 resource "aws_security_group" "default" {
   count = var.create ? 1 : 0
 
-  name        = "${var.environment}-default-sg"
+  name        = "${var.project}-${var.environment}-default-sg"
   description = "Default security group to allow inbound/outbound from the VPC"
   vpc_id      = aws_vpc.this[0].id
 

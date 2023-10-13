@@ -12,5 +12,17 @@ terraform {
 resource "aws_glue_catalog_database" "this" {
   count = var.create ? 1 : 0
 
-  name = "${var.environment}-${var.database_name}"
+  name = "${var.project}-${var.environment}-${var.database_name}-db"
+}
+
+resource "aws_glue_crawler" "this" {
+  count = var.create ? 1 : 0
+
+  database_name = aws_glue_catalog_database.this[0].name
+  name          = "${var.project}-${var.environment}-${var.database_name}-crawler"
+  role          = "sample"
+
+  s3_target {
+    path = var.s3_target_path
+  }
 }

@@ -16,7 +16,7 @@ locals {
 resource "aws_s3_bucket" "this" {
   count = var.create ? local.num_buckets : 0
 
-  bucket        = "${var.environment}-${var.bucket_names[count.index]}"
+  bucket        = "${var.project}-${var.bucket_names[count.index]}-${var.environment}"
   force_destroy = true
 }
 

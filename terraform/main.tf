@@ -28,10 +28,11 @@ provider "aws" {
 module "main_vpc" {
   source = "./modules/main-vpc"
 
-  create                  = false
+  create                  = true
   vpc_cidr_block          = "10.0.0.0/16"
   public_snet_cidr_block  = ["10.0.0.0/19", "10.0.32.0/19"]
   private_snet_cidr_block = ["10.0.96.0/19", "10.0.128.0/19"]
+  project                 = var.project
   environment             = var.environment
   additional_tags         = var.additional_tags
 }
@@ -43,8 +44,9 @@ module "main_vpc" {
 module "data_tiers" {
   source = "./modules/data-storage/s3"
 
-  create       = false
+  create       = true
   bucket_names = ["bronze", "silver", "gold"]
+  project      = var.project
   environment  = var.environment
 }
 
@@ -53,19 +55,24 @@ module "data_tiers" {
 #------------------------------------------------------------------------------
 
 module "mysql" {
-  source = "./modules/data-storage/mysql"
+  source = "./modules/data-storage/rds"
 
-  create                 = false
-  seed                   = false
+  create                 = true
+  seed                   = true
+  engine                 = "mysql"
+  database_name          = "sakilaDb"
+  engine_version         = "5.7"
   master_username        = "masteruser"
   master_password        = "masterpassword"
   public_key             = "~/.ssh/id_rsa.pub"
   db_subnet_group_ids    = module.main_vpc.public_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
   instance_subnet        = try(module.main_vpc.public_subnet_ids[0], "")
-  user_data              = "./modules/data-storage/mysql/user-data/seed-database.sh"
+  user_data              = "./modules/data-storage/rds/user-data/seed-database.sh"
   environment            = var.environment
-  additional_tags        = var.additional_tags
+  project                = var.project
+
+  additional_tags = var.additional_tags
 }
 
 #------------------------------------------------------------------------------
@@ -96,7 +103,8 @@ module "dms" {
   subnet_ids             = module.main_vpc.private_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
   environment            = var.environment
-  start_replication_task = true
+  project                = var.project
+  start_replication_task = false
 }
 
 #------------------------------------------------------------------------------
@@ -106,6 +114,9 @@ module "dms" {
 module "glue" {
   source = "./modules/data-transformation"
 
-  create        = true
-  database_name = "sakila"
+  create         = false
+  database_name  = "sakila"
+  s3_target_path = try("s3://${module.data_tiers.bucket_ids[0]}", "")
+  environment    = var.environment
+  project        = var.project
 }

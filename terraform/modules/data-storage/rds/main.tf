@@ -12,7 +12,7 @@ terraform {
 resource "aws_db_subnet_group" "this" {
   count = var.create ? 1 : 0
 
-  name        = "${var.environment}-${var.engine}-snet-grp"
+  name        = "${var.project}-${var.environment}-${var.engine}-snet-grp"
   description = "RDS ${var.engine} instance subnet group"
   subnet_ids  = var.db_subnet_group_ids
 }
@@ -21,8 +21,8 @@ resource "aws_db_instance" "this" {
   count = var.create ? 1 : 0
 
   allocated_storage      = var.allocated_storage
-  identifier             = "fun-db-dev"
-  db_name                = "fundb"
+  identifier             = "${var.project}-${var.environment}-${var.engine}-rds"
+  db_name                = var.database_name
   engine                 = var.engine
   engine_version         = var.engine_version
   instance_class         = var.database_instance_class
@@ -38,7 +38,7 @@ resource "aws_db_instance" "this" {
 resource "aws_key_pair" "this" {
   count = var.create && var.seed ? 1 : 0
 
-  key_name   = "${var.environment}-key"
+  key_name   = "${var.project}-${var.environment}-key"
   public_key = file(var.public_key)
 }
 
@@ -60,6 +60,6 @@ resource "aws_instance" "this" {
 
   tags = merge(
     var.additional_tags,
-    { Name = "${var.environment}-${var.engine}-seed" }
+    { Name = "${var.project}-${var.environment}-${var.engine}-seed" }
   )
 }
