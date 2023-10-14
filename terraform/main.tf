@@ -102,7 +102,7 @@ module "dms" {
     bucket_folder = "rds-mysql"
     data_format   = "parquet"
   }
-  table_mappings         = "./config/dms/sakila-table-mapping.json"
+  table_mappings         = "./modules/data-ingestion/migration-service/config/dms/sakila-table-mapping.json"
   subnet_ids             = module.main_vpc.private_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
   environment            = var.environment
