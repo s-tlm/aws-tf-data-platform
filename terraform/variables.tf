@@ -11,18 +11,16 @@ variable "environment" {
 variable "ingress_rules" {
   type = list(object({
     description = optional(string)
-    from_port   = number
-    to_port     = number
+    from_port   = optional(number)
+    to_port     = optional(number)
     ip_protocol = string
     cidr_ipv4   = optional(string)
-    self        = bool
+    self        = optional(bool, false)
   }))
   description = "A map of security group ingress rules to assign to the default security group"
   default = [
     {
       description = "Default"
-      from_port   = 0
-      to_port     = 0
       ip_protocol = "-1"
       self        = true
     },
@@ -32,7 +30,6 @@ variable "ingress_rules" {
       to_port     = 3306
       ip_protocol = "tcp"
       cidr_ipv4   = "0.0.0.0/0"
-      self        = false
     },
     {
       description = "Allow SSH to EC2"
@@ -40,7 +37,6 @@ variable "ingress_rules" {
       to_port     = 22
       ip_protocol = "tcp"
       cidr_ipv4   = "0.0.0.0/0"
-      self        = false
     }
   ]
 }
@@ -48,21 +44,18 @@ variable "ingress_rules" {
 variable "egress_rules" {
   type = list(object({
     description = optional(string)
-    from_port   = number
-    to_port     = number
+    from_port   = optional(number)
+    to_port     = optional(number)
     ip_protocol = string
     cidr_ipv4   = optional(string)
-    self        = bool
+    self        = optional(bool, false)
   }))
   description = "A map of security group egress rules to assign to the default security group"
   default = [
     {
       description = "Default"
-      from_port   = 0
-      to_port     = 0
       ip_protocol = "-1"
       cidr_ipv4   = "0.0.0.0/0"
-      self        = false
     }
   ]
 }

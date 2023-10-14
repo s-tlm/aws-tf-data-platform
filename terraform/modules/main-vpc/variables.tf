@@ -38,11 +38,11 @@ variable "private_snet_cidr_block" {
 variable "ingress_rules" {
   type = list(object({
     description = optional(string)
-    from_port   = number
-    to_port     = number
+    from_port   = optional(number)
+    to_port     = optional(number)
     ip_protocol = string
     cidr_ipv4   = optional(string)
-    self        = bool
+    self        = optional(bool, false)
   }))
   description = "A map of security group ingress rules to assign to the default security group"
   default     = []
@@ -51,11 +51,11 @@ variable "ingress_rules" {
 variable "egress_rules" {
   type = list(object({
     description = optional(string)
-    from_port   = number
-    to_port     = number
+    from_port   = optional(number)
+    to_port     = optional(number)
     ip_protocol = string
     cidr_ipv4   = optional(string)
-    self        = bool
+    self        = optional(bool, false)
   }))
   description = "A map of security group egress rules to assign to the default security group"
   default     = []
