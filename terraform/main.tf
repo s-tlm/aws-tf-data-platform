@@ -46,7 +46,7 @@ module "main_vpc" {
 module "data_tiers" {
   source = "./modules/data-storage/s3"
 
-  create       = false
+  create       = true
   bucket_names = ["bronze", "silver", "gold"]
   project      = var.project
   environment  = var.environment
@@ -59,14 +59,15 @@ module "data_tiers" {
 module "mysql" {
   source = "./modules/data-storage/rds"
 
-  create                 = false
-  seed                   = false
+  create                 = true
+  seed                   = true
   engine                 = "mysql"
   database_name          = "sakilaDb"
   engine_version         = "5.7"
   master_username        = "masteruser"
   master_password        = "masterpassword"
   public_key             = "~/.ssh/id_rsa.pub"
+  publicly_accessible    = false
   db_subnet_group_ids    = module.main_vpc.public_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
   instance_subnet        = try(module.main_vpc.public_subnet_ids[0], "")
@@ -84,7 +85,7 @@ module "mysql" {
 module "dms" {
   source = "./modules/data-ingestion/migration-service"
 
-  create        = false
+  create        = true
   target_s3_arn = try(module.data_tiers.bucket_arns[0], "")
   source_endpoint = {
     endpoint_type = "source"

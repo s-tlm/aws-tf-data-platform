@@ -42,6 +42,18 @@ variable "database_instance_class" {
   default     = "db.t3.micro"
 }
 
+variable "storage_encrypted" {
+  type        = bool
+  description = "Whether the database is encrypted"
+  default     = true
+}
+
+variable "publicly_accessible" {
+  type        = bool
+  description = "Whether the database is publicly accessible"
+  default     = true
+}
+
 variable "instance_type" {
   type        = string
   description = "The EC2 seed instance type"

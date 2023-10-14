@@ -30,9 +30,10 @@ resource "aws_db_instance" "this" {
   password               = var.master_password
   db_subnet_group_name   = aws_db_subnet_group.this[0].name
   vpc_security_group_ids = var.vpc_security_group_ids
+  storage_encrypted      = var.storage_encrypted
+  publicly_accessible    = var.publicly_accessible
 
   skip_final_snapshot = true
-  publicly_accessible = true
 }
 
 resource "aws_key_pair" "this" {
