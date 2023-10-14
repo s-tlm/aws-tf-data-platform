@@ -9,7 +9,6 @@ terraform {
   required_version = ">= 1.5.7"
 }
 
-data "aws_region" "current" {}
 data "aws_partition" "current" {}
 data "aws_availability_zones" "this" {
   state = "available"
@@ -18,7 +17,6 @@ data "aws_availability_zones" "this" {
 locals {
   # https://registry.terraform.io/modules/terraform-aws-modules/dms/aws/latest
   dns_suffix = data.aws_partition.current.dns_suffix
-  region     = data.aws_region.current.name
 }
 
 data "aws_iam_policy_document" "role_assume" {
@@ -34,7 +32,6 @@ data "aws_iam_policy_document" "role_assume" {
     principals {
       identifiers = [
         "dms.${local.dns_suffix}",
-        "dms.${local.region}.${local.dns_suffix}",
       ]
       type = "Service"
     }
@@ -85,7 +82,7 @@ resource "aws_iam_policy" "access_s3" {
   count = var.create ? 1 : 0
 
   name        = "${var.project}-${var.environment}-dms-s3-policy"
-  description = "Policy to access DMS target S3 bucket"
+  description = "Policy for DMS to access target S3 bucket"
   policy      = data.aws_iam_policy_document.access_s3[0].json
 }
 

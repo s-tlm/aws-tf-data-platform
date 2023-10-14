@@ -28,7 +28,7 @@ provider "aws" {
 module "main_vpc" {
   source = "./modules/main-vpc"
 
-  create                  = true
+  create                  = false
   vpc_cidr_block          = "10.0.0.0/16"
   public_snet_cidr_block  = ["10.0.0.0/19", "10.0.32.0/19"]
   private_snet_cidr_block = ["10.0.96.0/19", "10.0.128.0/19"]
@@ -59,8 +59,8 @@ module "data_tiers" {
 module "mysql" {
   source = "./modules/data-storage/rds"
 
-  create                 = true
-  seed                   = true
+  create                 = false
+  seed                   = false
   engine                 = "mysql"
   database_name          = "sakilaDb"
   engine_version         = "5.7"
@@ -85,7 +85,7 @@ module "mysql" {
 module "dms" {
   source = "./modules/data-ingestion/migration-service"
 
-  create        = true
+  create        = false
   target_s3_arn = try(module.data_tiers.bucket_arns[0], "")
   source_endpoint = {
     endpoint_type = "source"
@@ -117,9 +117,10 @@ module "dms" {
 module "glue" {
   source = "./modules/data-transformation"
 
-  create         = false
+  create         = true
   database_name  = "sakila"
-  s3_target_path = try("s3://${module.data_tiers.bucket_ids[0]}", "")
+  target_s3_arn  = try(module.data_tiers.bucket_arns[0], "")
+  target_s3_path = try("s3://${module.data_tiers.bucket_ids[0]}/rds-mysql/sakila", "")
   environment    = var.environment
   project        = var.project
 }
