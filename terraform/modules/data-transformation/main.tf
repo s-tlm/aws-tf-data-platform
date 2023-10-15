@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "access_s3" {
 resource "aws_iam_policy" "access_s3" {
   count = var.create ? 1 : 0
 
-  name        = "${var.project}-${var.environment}-dms-s3-policy"
+  name        = "${var.project}-${var.environment}-glue-s3-policy"
   description = "Policy for Glue to access target S3 bucket"
   policy      = data.aws_iam_policy_document.access_s3[0].json
 }
@@ -60,9 +60,10 @@ resource "aws_iam_policy" "access_s3" {
 resource "aws_iam_role" "access_s3" {
   count = var.create ? 1 : 0
 
-  name               = "${var.project}-${var.environment}-glue-s3-role"
-  description        = "IAM service role for Glue to access target S3 bucket"
-  assume_role_policy = data.aws_iam_policy_document.role_assume[0].json
+  name                = "${var.project}-${var.environment}-glue-s3-role"
+  description         = "IAM service role for Glue to access target S3 bucket"
+  assume_role_policy  = data.aws_iam_policy_document.role_assume[0].json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
 
   force_detach_policies = true
 }
