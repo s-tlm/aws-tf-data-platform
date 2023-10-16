@@ -29,7 +29,6 @@ variable "public_snet_cidr_block" {
   description = "Public subnets CIDR block"
 }
 
-
 variable "private_snet_cidr_block" {
   type        = list(string)
   description = "Private subnets CIDR block"
