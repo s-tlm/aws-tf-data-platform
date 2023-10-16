@@ -54,12 +54,6 @@ module "data_tiers" {
   environment  = var.environment
 }
 
-# Create folder
-resource "aws_s3_object" "object" {
-  bucket = module.data_tiers.bucket_ids[0]
-  key    = "new_object_key"
-}
-
 #------------------------------------------------------------------------------
 # Create MySQL Database and Seed Data
 #------------------------------------------------------------------------------
@@ -123,6 +117,11 @@ module "dms" {
 #------------------------------------------------------------------------------
 # Create Glue Data Catalog and Crawlers
 #------------------------------------------------------------------------------
+# Create folder in landing if it doesn't exist
+resource "aws_s3_object" "this" {
+  bucket = module.data_tiers.bucket_ids[0]
+  key    = "rds-mysql/${var.glue_database_name}/"
+}
 
 module "glue" {
   source = "./modules/data-transformation"
@@ -131,7 +130,7 @@ module "glue" {
 
   database_name  = var.glue_database_name
   target_s3_arn  = try(module.data_tiers.bucket_arns[0], "")
-  target_s3_path = try("s3://${module.data_tiers.bucket_ids[0]}/rds-mysql/${var.glue_database_name}", "")
+  target_s3_path = try("s3://${module.data_tiers.bucket_ids[0]}/${aws_s3_object.this.id}", "")
   environment    = var.environment
   project        = var.project
 }
