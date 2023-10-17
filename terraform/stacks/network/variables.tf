@@ -1,3 +1,8 @@
+variable "default_region" {
+  type    = string
+  default = "ap-southeast-2"
+}
+
 variable "create" {
   type        = bool
   description = "Create resource?"
@@ -18,7 +23,6 @@ variable "project" {
 variable "environment" {
   type        = string
   description = "The AWS environment name"
-  default     = "fun"
 }
 
 variable "vpc_cidr_block" {

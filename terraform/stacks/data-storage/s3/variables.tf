@@ -1,7 +1,18 @@
+variable "default_region" {
+  type    = string
+  default = "ap-southeast-2"
+}
+
 variable "create" {
   type        = bool
   description = "Create resource?"
-  default     = false
+  default     = true
+}
+
+variable "additional_tags" {
+  type        = map(string)
+  description = "Additional resource tags"
+  default     = {}
 }
 
 variable "project" {
@@ -12,7 +23,6 @@ variable "project" {
 variable "environment" {
   type        = string
   description = "The AWS environment name"
-  default     = "fun"
 }
 
 variable "bucket_names" {

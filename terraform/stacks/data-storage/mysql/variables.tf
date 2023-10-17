@@ -1,7 +1,24 @@
+variable "default_region" {
+  type    = string
+  default = "ap-southeast-2"
+}
+
 variable "create" {
   type        = bool
-  description = "Create RDS instance?"
+  description = "Create resource?"
   default     = true
+}
+
+variable "seed" {
+  type        = bool
+  description = "Seed database with sample data?"
+  default     = true
+}
+
+variable "additional_tags" {
+  type        = map(string)
+  description = "Additional resource tags"
+  default     = {}
 }
 
 variable "project" {
@@ -9,10 +26,9 @@ variable "project" {
   description = "The Terraform project name"
 }
 
-variable "seed" {
-  type        = bool
-  description = "Seed database with sample data?"
-  default     = true
+variable "environment" {
+  type        = string
+  description = "The AWS environment name"
 }
 
 variable "allocated_storage" {
@@ -71,12 +87,6 @@ variable "user_data" {
   description = "The directory of the bash script used to initialise the EC2 seed instance"
 }
 
-variable "environment" {
-  type        = string
-  description = "The AWS environment name"
-  default     = "fun"
-}
-
 variable "master_username" {
   type        = string
   sensitive   = true
@@ -89,28 +99,7 @@ variable "master_password" {
   description = "The master password for the RDS instance"
 }
 
-variable "db_subnet_group_ids" {
-  type        = list(string)
-  description = "A list of subnet IDs to form the database subnet group"
-}
-
-variable "vpc_security_group_ids" {
-  type        = list(string)
-  description = "A list of VPC security group IDs to assign to the database and EC2 instances"
-}
-
 variable "public_key" {
   type        = string
   description = "The directory of the SSH public key used to connect to the EC2 seed instance"
-}
-
-variable "instance_subnet" {
-  type        = string
-  description = "The subnet ID that will host the EC2 seed instance"
-}
-
-variable "additional_tags" {
-  type        = map(string)
-  description = "Additional resource tags"
-  default     = {}
 }
