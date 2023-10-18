@@ -4,6 +4,7 @@ Basic AWS data platform provisioned with Terraform.
 
 ## TODO
 
-1. Setup DBT Core
-2. Setup Mage
-3. Setup OLAP database
+1. Setup VPN
+2. Setup OLAP database
+3. Setup DBT Core
+4. Setup Mage
