@@ -112,7 +112,10 @@ resource "aws_instance" "this" {
     module.main_vpc.default_vpc_security_group_id,
     aws_security_group.vpn[0].id
   ]
+  user_data = file("./cloud-init.sh")
+
   associate_public_ip_address = true
+  user_data_replace_on_change = true
 
   tags = merge(
     var.additional_tags,
