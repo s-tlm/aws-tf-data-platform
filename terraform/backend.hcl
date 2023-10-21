@@ -1,4 +1,4 @@
-bucket         = "awsverse-remote-state-stevelam"
+bucket         = "fun-tf-state-dev"
 region         = "ap-southeast-2"
-dynamodb_table = "awsverse-state-lock-stevelam"
+dynamodb_table = "fun-tf-state-lock-dev"
 encrypt        = true

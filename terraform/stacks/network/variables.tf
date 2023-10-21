@@ -68,14 +68,8 @@ variable "egress_rules" {
 
 variable "public_key" {
   type        = string
-  sensitive = true
+  sensitive   = true
   description = "The directory of the SSH public key used to connect to the EC2 seed instance"
-}
-
-variable "activation_key" {
-    type        = string
-    sensitive   = true
-    description = "The OpenVPN activation key"
 }
 
 variable "instance_type" {

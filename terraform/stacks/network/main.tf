@@ -48,7 +48,7 @@ module "main_vpc" {
 # EC2 Instance Type (default t3.small)
 
 resource "aws_security_group" "vpn" {
-  count = var.create ? 1 : 0 
+  count = var.create ? 1 : 0
 
   name        = "${var.project}-${var.environment}-vpn-instance-sg"
   description = "Security group to allow inbound/outbound to the OpenVPN server"
@@ -60,30 +60,30 @@ locals {
     {
       description = "Admin Web UI"
       ip_protocol = "tcp"
-      from_port = "943"
-      to_port = "943"
-      cidr_ipv4 = "0.0.0.0/0"
+      from_port   = "943"
+      to_port     = "943"
+      cidr_ipv4   = "0.0.0.0/0"
     },
     {
       description = "Client Web UI"
       ip_protocol = "tcp"
-      from_port = "443"
-      to_port = "443"
-      cidr_ipv4 = "0.0.0.0/0"
+      from_port   = "443"
+      to_port     = "443"
+      cidr_ipv4   = "0.0.0.0/0"
     },
     {
       description = "OpenVPN UDP"
       ip_protocol = "udp"
-      from_port = "1194"
-      to_port = "1194"
-      cidr_ipv4 = "0.0.0.0/0"
+      from_port   = "1194"
+      to_port     = "1194"
+      cidr_ipv4   = "0.0.0.0/0"
     },
     {
       description = "SSH"
       ip_protocol = "tcp"
-      from_port = "22"
-      to_port = "22"
-      cidr_ipv4 = "0.0.0.0/0"
+      from_port   = "22"
+      to_port     = "22"
+      cidr_ipv4   = "0.0.0.0/0"
     }
   ]
   num_ingress_rules = length(local.ingress_rules)
@@ -93,11 +93,11 @@ resource "aws_vpc_security_group_ingress_rule" "vpn" {
   count = var.create ? local.num_ingress_rules : 0
 
   security_group_id = aws_security_group.vpn[0].id
-  description = local.ingress_rules[count.index]["description"]
-  cidr_ipv4 = local.ingress_rules[count.index]["cidr_ipv4"]
-  from_port = local.ingress_rules[count.index]["from_port"]
-  to_port = local.ingress_rules[count.index]["to_port"]
-  ip_protocol = local.ingress_rules[count.index]["ip_protocol"]
+  description       = local.ingress_rules[count.index]["description"]
+  cidr_ipv4         = local.ingress_rules[count.index]["cidr_ipv4"]
+  from_port         = local.ingress_rules[count.index]["from_port"]
+  to_port           = local.ingress_rules[count.index]["to_port"]
+  ip_protocol       = local.ingress_rules[count.index]["ip_protocol"]
 }
 
 resource "aws_key_pair" "this" {
@@ -112,11 +112,14 @@ resource "aws_key_pair" "this" {
 resource "aws_instance" "this" {
   count = var.create ? 1 : 0
 
-  ami                    = "ami-0df4b2961410d4cff" # Ubuntu Server 20.04
-  instance_type          = var.instance_type
-  key_name               = aws_key_pair.this[0].key_name
-  subnet_id              = module.main_vpc.public_subnet_ids[0]
-  vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
+  ami           = "ami-0df4b2961410d4cff" # Ubuntu Server 20.04
+  instance_type = var.instance_type
+  key_name      = aws_key_pair.this[0].key_name
+  subnet_id     = module.main_vpc.public_subnet_ids[0]
+  vpc_security_group_ids = [
+    module.main_vpc.default_vpc_security_group_id,
+    aws_security_group.vpn[0].id
+  ]
   associate_public_ip_address = true
 
   tags = merge(
