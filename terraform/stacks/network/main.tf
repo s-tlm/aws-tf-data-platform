@@ -30,11 +30,11 @@ module "main_vpc" {
 
   create = var.create
 
-  vpc_cidr_block          = var.vpc_cidr_block
-  public_snet_cidr_block  = var.public_snet_cidr_block
-  private_snet_cidr_block = var.private_snet_cidr_block
-  ingress_rules           = var.ingress_rules
-  egress_rules            = var.egress_rules
+  vpc_cidr_block      = var.vpc_cidr_block
+  public_snet_config  = var.public_snet_config
+  private_snet_config = var.private_snet_config
+  ingress_rules       = var.ingress_rules
+  egress_rules        = var.egress_rules
 
   project         = var.project
   environment     = var.environment

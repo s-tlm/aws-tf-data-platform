@@ -10,10 +10,12 @@ terraform {
 }
 
 locals {
-  num_public_subnets  = length(var.public_snet_cidr_block)
-  num_private_subnets = length(var.private_snet_cidr_block)
+  num_public_subnets  = length(var.public_snet_config)
+  num_private_subnets = length(var.private_snet_config)
   num_ingress_rules   = length(var.ingress_rules)
   num_egress_rules    = length(var.egress_rules)
+  snets_with_nat      = [for each in var.public_snet_config : index(var.public_snet_config, each) if each.nat_gateway]
+  num_snets_with_nat  = length(local.snets_with_nat)
 }
 
 resource "aws_vpc" "this" {
@@ -37,7 +39,7 @@ resource "aws_subnet" "public" {
   count = var.create ? local.num_public_subnets : 0
 
   vpc_id                  = aws_vpc.this[0].id
-  cidr_block              = var.public_snet_cidr_block[count.index]
+  cidr_block              = var.public_snet_config[count.index]["cidr_block"]
   availability_zone       = data.aws_availability_zones.this.names[count.index]
   map_public_ip_on_launch = true
 
@@ -51,7 +53,7 @@ resource "aws_subnet" "private" {
   count = var.create ? local.num_private_subnets : 0
 
   vpc_id            = aws_vpc.this[0].id
-  cidr_block        = var.private_snet_cidr_block[count.index]
+  cidr_block        = var.private_snet_config[count.index]["cidr_block"]
   availability_zone = data.aws_availability_zones.this.names[count.index]
 
   tags = merge(
@@ -72,17 +74,17 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_eip" "this" {
-  count = var.create ? local.num_private_subnets : 0
+  count = var.create ? local.num_snets_with_nat : 0
 
   domain     = "vpc"
   depends_on = [aws_internet_gateway.this]
 }
 
 resource "aws_nat_gateway" "this" {
-  count = var.create ? local.num_private_subnets : 0
+  count = var.create ? local.num_snets_with_nat : 0
 
   allocation_id = aws_eip.this[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id
+  subnet_id     = aws_subnet.public[local.snets_with_nat[count.index]].id
   depends_on    = [aws_internet_gateway.this[0]]
   tags = merge(
     var.additional_tags,
@@ -124,7 +126,7 @@ resource "aws_route" "private" {
 
   route_table_id         = aws_route_table.private[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.this[count.index].id
+  nat_gateway_id         = aws_nat_gateway.this[var.private_snet_config[count.index]["route_nat_to_subnet_index"]].id
 }
 
 resource "aws_route_table_association" "public" {

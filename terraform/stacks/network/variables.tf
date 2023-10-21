@@ -30,14 +30,20 @@ variable "vpc_cidr_block" {
   description = "Main VPC CIDR block"
 }
 
-variable "public_snet_cidr_block" {
-  type        = list(string)
-  description = "Public subnets CIDR block"
+variable "public_snet_config" {
+  type = list(object({
+    cidr_block  = string
+    nat_gateway = optional(bool, false)
+  }))
+  description = "Public subnets CIDR block and NAT configuration"
 }
 
-variable "private_snet_cidr_block" {
-  type        = list(string)
-  description = "Private subnets CIDR block"
+variable "private_snet_config" {
+  type = list(object({
+    cidr_block                = string
+    route_nat_to_subnet_index = number
+  }))
+  description = "Private subnets CIDR block and NAT configuration"
 }
 
 variable "ingress_rules" {
