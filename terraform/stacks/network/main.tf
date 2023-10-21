@@ -41,12 +41,6 @@ module "main_vpc" {
   additional_tags = var.additional_tags
 }
 
-# Provision VPN server
-# VARIABLES
-# VPC ID
-# Public Subnet ID
-# EC2 Instance Type (default t3.small)
-
 resource "aws_security_group" "vpn" {
   count = var.create ? 1 : 0
 
@@ -106,8 +100,6 @@ resource "aws_key_pair" "this" {
   key_name   = "${var.project}-${var.environment}-vpn-instance-key"
   public_key = file(var.public_key)
 }
-# Deploy EC2 in public subnet
-# Provision using Open VPN AMI
 
 resource "aws_instance" "this" {
   count = var.create ? 1 : 0
