@@ -39,7 +39,7 @@ resource "aws_db_instance" "this" {
 resource "aws_key_pair" "this" {
   count = var.create && var.seed ? 1 : 0
 
-  key_name   = "${var.project}-${var.environment}-key"
+  key_name   = "${var.project}-${var.environment}-rds-seed-instance-key"
   public_key = file(var.public_key)
 }
 

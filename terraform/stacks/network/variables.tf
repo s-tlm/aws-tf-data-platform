@@ -65,3 +65,21 @@ variable "egress_rules" {
   description = "A map of security group egress rules to assign to the default security group"
   default     = []
 }
+
+variable "public_key" {
+  type        = string
+  sensitive = true
+  description = "The directory of the SSH public key used to connect to the EC2 seed instance"
+}
+
+variable "activation_key" {
+    type        = string
+    sensitive   = true
+    description = "The OpenVPN activation key"
+}
+
+variable "instance_type" {
+  type        = string
+  description = "The EC2 instance type"
+  default     = "t3.small"
+}

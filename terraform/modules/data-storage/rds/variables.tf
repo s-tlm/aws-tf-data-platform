@@ -101,6 +101,7 @@ variable "vpc_security_group_ids" {
 
 variable "public_key" {
   type        = string
+  sensitive = true
   description = "The directory of the SSH public key used to connect to the EC2 seed instance"
 }
 
