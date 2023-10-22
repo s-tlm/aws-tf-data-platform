@@ -4,7 +4,8 @@ Basic AWS data platform provisioned with Terraform.
 
 ## TODO
 
-1. Setup VPN
-2. Setup OLAP database
-3. Setup DBT Core
-4. Setup Mage
+- [] Setup VPN
+- [] Setup OLAP database
+- [] Setup DBT Core
+- [] Setup Airflow
+- [] Enable `terraform-docs`
