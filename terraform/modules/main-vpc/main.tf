@@ -25,7 +25,7 @@ resource "aws_vpc" "this" {
   enable_dns_hostnames = true
 
   tags = merge(
-    var.additional_tags,
+    var.default_tags,
     { Name = "${var.project}-${var.environment}-vpc" }
   )
 }
@@ -44,7 +44,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = merge(
-    var.additional_tags,
+    var.default_tags,
     { Name = "${var.project}-${var.environment}-pub-snet${count.index + 1}" }
   )
 }
@@ -57,7 +57,7 @@ resource "aws_subnet" "private" {
   availability_zone = data.aws_availability_zones.this.names[count.index]
 
   tags = merge(
-    var.additional_tags,
+    var.default_tags,
     { Name = "${var.project}-${var.environment}-prv-snet${count.index + 1}" }
   )
 }
@@ -68,7 +68,7 @@ resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this[0].id
 
   tags = merge(
-    var.additional_tags,
+    var.default_tags,
     { Name = "${var.project}-${var.environment}-igw" }
   )
 }
@@ -87,7 +87,7 @@ resource "aws_nat_gateway" "this" {
   subnet_id     = aws_subnet.public[local.snets_with_nat[count.index]].id
   depends_on    = [aws_internet_gateway.this[0]]
   tags = merge(
-    var.additional_tags,
+    var.default_tags,
     { Name = "${var.project}-${var.environment}-nat${count.index + 1}" }
   )
 }
@@ -98,7 +98,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this[0].id
 
   tags = merge(
-    var.additional_tags,
+    var.default_tags,
     { Name = "${var.project}-${var.environment}-pub-rtbl" }
   )
 }
@@ -116,7 +116,7 @@ resource "aws_route_table" "private" {
 
   vpc_id = aws_vpc.this[0].id
 
-  tags = merge(var.additional_tags,
+  tags = merge(var.default_tags,
     { Name = "${var.project}-${var.environment}-prv-rtbl${count.index + 1}" }
   )
 }

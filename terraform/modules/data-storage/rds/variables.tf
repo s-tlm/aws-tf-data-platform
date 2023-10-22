@@ -66,7 +66,7 @@ variable "instance_ami" {
   default     = "ami-0e812285fd54f7620"
 }
 
-variable "user_data" {
+variable "user_data_dir" {
   type        = string
   description = "The directory of the bash script used to initialise the EC2 seed instance"
 }
@@ -101,7 +101,7 @@ variable "vpc_security_group_ids" {
 
 variable "public_key" {
   type        = string
-  sensitive = true
+  sensitive   = true
   description = "The directory of the SSH public key used to connect to the EC2 seed instance"
 }
 
@@ -110,8 +110,8 @@ variable "instance_subnet" {
   description = "The subnet ID that will host the EC2 seed instance"
 }
 
-variable "additional_tags" {
+variable "default_tags" {
   type        = map(string)
-  description = "Additional resource tags"
+  description = "Default resource tags"
   default     = {}
 }

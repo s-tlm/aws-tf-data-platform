@@ -4,9 +4,9 @@ variable "create" {
   default     = true
 }
 
-variable "additional_tags" {
+variable "default_tags" {
   type        = map(string)
-  description = "Additional resource tags"
+  description = "Default resource tags"
   default     = {}
 }
 

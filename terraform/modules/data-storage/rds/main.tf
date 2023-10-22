@@ -51,7 +51,7 @@ resource "aws_instance" "this" {
   key_name               = aws_key_pair.this[0].key_name
   subnet_id              = var.instance_subnet
   vpc_security_group_ids = var.vpc_security_group_ids
-  user_data = templatefile(var.user_data, {
+  user_data = templatefile(var.user_data_dir, {
     host     = try(aws_db_instance.this[0].address, ""),
     username = var.master_username,
     password = var.master_password
@@ -60,7 +60,7 @@ resource "aws_instance" "this" {
   associate_public_ip_address = true
 
   tags = merge(
-    var.additional_tags,
+    var.default_tags,
     { Name = "${var.project}-${var.environment}-${var.engine}-seed" }
   )
 }
