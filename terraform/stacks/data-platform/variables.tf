@@ -29,7 +29,7 @@ variable "environment" {
 
 variable "create_network" {
   type        = bool
-  description = "Create VPC and VPN?"
+  description = "Create VPC?"
   default     = true
 }
 
@@ -84,17 +84,6 @@ variable "ssh_key" {
   type        = string
   sensitive   = true
   description = "The directory of the SSH public key used to connect to the EC2 instance"
-}
-
-variable "vpn_instance_type" {
-  type        = string
-  description = "The EC2 instance type"
-  default     = "t3.micro"
-}
-
-variable "vpn_user_data_dir" {
-  type        = string
-  description = "The directory of the bash script used to initialise the EC2 VPN instance"
 }
 
 #------------------------------------------------------------------------------
