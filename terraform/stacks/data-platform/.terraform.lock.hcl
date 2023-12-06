@@ -1,6 +1,20 @@
 # This file is maintained automatically by "terraform init".
 # Manual edits may be lost in future updates.
 
+provider "registry.terraform.io/databricks/databricks" {
+  version     = "1.31.0"
+  constraints = "~> 1.31"
+  hashes = [
+    "h1:ko/U1qjaHSIqw4N4PC200knupBcLgCtNkU405P90tT0=",
+    "zh:1904a31b791b497e977918bdf15ad70eb21d560a14b29434ff160723bf02d2fe",
+    "zh:1a739486f41406669a2202598afcc5563483ac8623e2a24601dd4f95bca626d2",
+    "zh:4133c29a6454d6930cfa54bb2efad6d6a7708e2c6c12cc21c4f36d6955bd1490",
+    "zh:68ad4cf7a193e50b5ba6b2c20e41d7638fe99bbb5302a5d0c71d72f1907ecb68",
+    "zh:b87c080340fe1ea300f2b52b05cf194b58cd0ad99891e2a8f5c436775cb45f8a",
+    "zh:c4309e262754e63d9b6c63d25a5f6203444d195c80b7692da488ed0f7d40f749",
+  ]
+}
+
 provider "registry.terraform.io/hashicorp/aws" {
   version     = "5.22.0"
   constraints = "~> 5.0"

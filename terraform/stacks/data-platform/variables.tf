@@ -228,3 +228,30 @@ variable "start_replication_task" {
   description = "Whether to auto-start the replication task"
   default     = false
 }
+
+#------------------------------------------------------------------------------
+# Databricks
+#------------------------------------------------------------------------------
+
+variable "create_databricks" {
+  type        = bool
+  description = "Create Databricks?"
+  default     = true
+}
+
+variable "databricks_client_id" {
+  type        = string
+  description = "The Databricks Service Principal application ID"
+  sensitive   = true
+}
+
+variable "databricks_client_secret" {
+  type        = string
+  description = "The Databricks Service Principal authentication secret"
+  sensitive   = true
+}
+
+variable "databricks_account_id" {
+  type        = string
+  description = "The Databricks Account ID"
+}

@@ -4,6 +4,11 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+
+    databricks = {
+      source  = "databricks/databricks"
+      version = "~> 1.31"
+    }
   }
 
   required_version = ">= 1.5.7"
