@@ -9,6 +9,11 @@ terraform {
       source  = "databricks/databricks"
       version = "~> 1.31"
     }
+
+    time = {
+      source  = "hashicorp/time"
+      version = "0.9.2"
+    }
   }
 
   required_version = ">= 1.5.7"
@@ -43,7 +48,17 @@ resource "databricks_mws_credentials" "this" {
   role_arn         = aws_iam_role.this[0].arn
   credentials_name = "${var.project}-db-creds-${var.environment}"
 
-  depends_on = [aws_iam_role_policy.this[0]]
+  depends_on = [
+    # https://kb.databricks.com/en_US/terraform/failed-credential-validation-checks-error-with-terraform
+    time_sleep.wait
+  ]
+}
+
+resource "time_sleep" "wait" {
+  count = var.create ? 1 : 0
+
+  depends_on      = [aws_iam_role_policy.this[0]]
+  create_duration = "5s"
 }
 
 # Configure Databricks Network
