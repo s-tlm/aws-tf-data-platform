@@ -18,7 +18,7 @@ module "dms" {
     bucket_folder = var.target_s3_endpoint["bucket_folder"]
     data_format   = var.target_s3_endpoint["data_format"]
   }
-  target_s3_arn          = module.data_tiers.bucket_arns[0]
+  target_s3_arn          = try(module.data_tiers.bucket_arns[0], false)
   table_mappings         = var.table_mapping_dir
   subnet_ids             = module.main_vpc.private_subnet_ids
   vpc_security_group_ids = [module.main_vpc.default_vpc_security_group_id]
