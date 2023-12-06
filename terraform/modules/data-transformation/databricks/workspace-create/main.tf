@@ -26,8 +26,7 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.databricks_aws_assume_role_policy.this.json
 }
 
-data "databricks_aws_crossaccount_policy" "this" {
-}
+data "databricks_aws_crossaccount_policy" "this" {}
 
 resource "aws_iam_role_policy" "this" {
   count = var.create ? 1 : 0
